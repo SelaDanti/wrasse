@@ -1,0 +1,89 @@
+.map{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+.circle {
+    position: absolute;
+    top: 1em;
+    left: 5em;
+    z-index: 22; 
+}
+
+.polygon {
+    position: absolute;
+    top: 1em;
+    left: 15em;
+    z-index: 22; 
+}
+
+.bounding-box {
+    position: absolute;
+    top: 1em;
+    left: 25em;
+    z-index: 22; 
+}
+
+.panel {
+    position: absolute;
+    top: 1em;
+    left: 40em;
+    z-index: 22; 
+}
+
+button {
+    padding: 1em;
+    background-color: #2A324B;
+    color: yellow;
+    border-radius: 25px;
+    border-style: none;
+    opacity: 0.7;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 1em;
+    text-transform: uppercase;
+}
+
+button:hover {
+    opacity: 1;
+    animation-name: fade-in;
+    animation-duration: .5s;
+    color: #fff;
+}
+
+@keyframes fade-in{
+    from {opacity: 0.7; color: yellow}
+    to{opacity: 1; color: #fff}
+}
+
+.show-panel {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 15em;
+    z-index: 1;
+    background-color: white;
+    animation-name: slide-up;
+    animation-duration: 1s;
+}
+
+@keyframes slide-up{
+    from {height: 0em;}
+    to {height: 15em;}
+}
+
+.hide-panel {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0em;
+    z-index: 1;
+    background-color: white;
+    animation-name: slide-down;
+    animation-duration: 1s;
+}
+
+@keyframes slide-down{
+    from {height: 15em;display: block;}
+    to {height: 0em; display: none;}
+}
