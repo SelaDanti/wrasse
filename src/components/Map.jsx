@@ -17,9 +17,14 @@ class Map extends React.Component {
     map: null,
     draw: null,
     showPanel: false,
+    coordinates: [],
+    isMapLoaded: false,
+    mode: '',
+    data: null
   }
   componentDidMount() {
-    MapboxGl.accessToken = 'pk.eyJ1Ijoic2VsYWRhbnRpIiwiYSI6ImNrMmZsNDRzeTBqbWgzb3BiZ2dtN2xldzYifQ.p35N5Dy5ygo1BbUxH_blFQ';
+    // get token from mapbox
+    MapboxGl.accessToken = process.env.REACT_APP_MAP_TOKEN;
 
     let map = new MapboxGl.Map({
       container: this.mapDiv,
@@ -49,46 +54,98 @@ class Map extends React.Component {
       draw, map
     })
     map.on('load', () => {
+      this.setState({
+        isMapLoaded: true
+      })
       map.addControl(draw);
       map.on("draw.create", this.getCoordinates);
       map.on("draw.update", this.getCoordinates);
-      map.on("draw.delete", this.getCoordinates);
     })
   }
 
+  /**
+   * get th coordinates of the drawn object 
+   */
   getCoordinates = () => {
     const { draw } = this.state;
-    let data = draw.getAll()
-    console.log(data)
 
+    let data = draw.getAll();
+    this.setState({
+      ...this.state,
+      data,
+      mode: draw.getMode().split('_')[1]
+    })
   }
 
-  changeMode = (mode) => () => {
+  /**
+   * change the current draw mode 
+   */
+  changeMode = (modeStr) => () => {
     const { draw } = this.state;
-    draw.changeMode(mode, { initialRadiusInKm: 0.5 });
-    console.log(draw.options)
+    
+    let data = draw.getAll()
+
+    if (data.features.length !== 0) {
+      draw.deleteAll();
+    }
+    draw.changeMode(modeStr, { initialRadiusInKm: 0.5 });
   }
 
+  /**
+   * togle the coordinate panel
+   */
   toglePanel = () => {
-    this.setState(prevState  => ({
+    this.setState(prevState => ({
       ...prevState,
       showPanel: !prevState.showPanel
     }))
   }
 
-  render() {
-    const {showPanel} =this.state;
+  /**
+   * return the respective coordinates 
+   */
+  renderCoordinates = () => {
+    const {mode, data} = this.state;
+    if (mode === 'circle' || mode === 'select'){
+      let radius = data.features[0].properties.radiusInKm;
+      let coordinates = data.features[0].properties.center;
+      return (
+         <p> Item selected is {mode} with  radius {radius}km and coordinates {coordinates.join(',')} </p>   
+      )
+    }
+   if (mode === 'polygon' || mode === 'select'){
+      let coordinates = data.features[0].geometry.coordinates[0].join(',');
+      return (
+        <p>Items selected is {mode} with coordinates {coordinates}</p>
+      )   
+    }
+  if (mode === 'rectangle' || mode === 'select'){
+    let coordinates = data.features[0].geometry.coordinates[0]
+    const topLeft = coordinates[0].join(',')
+    const bottomRight = coordinates[3].join(',')
     return (
-      <div>
-        <button className="circle" onClick={this.changeMode('draw_circle')}>circle</button>
-        <button className="polygon" onClick={this.changeMode('draw_polygon')}>Polygon</button>
-        <button className="bounding-box" onClick={this.changeMode('draw_rectangle')}>bounding box</button>
-        <button className="panel" onClick={this.toglePanel}>{showPanel ? 'close panel' : 'show panel'}</button>
+      <p>Item selected is bounding box with top left coordinates - {topLeft} and bottom right coordinates {bottomRight}</p>
+    )
+  }
+  }
+  render() {
+    const { showPanel, isMapLoaded } = this.state;
+    return (
+      <React.Fragment>
+        {isMapLoaded
+          &&
+          <div>
+            <button className="circle" onClick={this.changeMode('draw_circle')}>circle</button>
+            <button className="polygon" onClick={this.changeMode('draw_polygon')}>Polygon</button>
+            <button className="bounding-box" onClick={this.changeMode('draw_rectangle')}>bounding box</button>
+            <button className="panel" onClick={this.toglePanel}>{showPanel ? 'close coordinates' : 'show coordinates'}</button>
+          </div>
+        }
         <div ref={e => (this.mapDiv = e)} className="map"></div>
         <div className={showPanel ? 'show-panel' : 'hide-panel'}>
-f
+          {this.renderCoordinates()}
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }
