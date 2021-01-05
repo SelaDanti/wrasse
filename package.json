@@ -5,7 +5,7 @@
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.1.2",
     "@turf/turf": "^5.1.6",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "mapbox-gl": "^1.5.0",
     "mapbox-gl-draw-circle": "^1.1.1",
